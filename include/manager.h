@@ -1,5 +1,5 @@
-//managerr.h
-//be used to manage client unity and order
+//manager.h
+//be used to manage client , unity and order
 
 #pragma once
 #ifndef MANAGER_H
@@ -8,13 +8,13 @@
 
 
 //order
-typedef struct{
+typedef struct Order_info{
     double dx=0,dy=0;
     string food;
     int priority=0;
-    bool operator==(Order_info&other){
-        return dx==other.dx && dy==other.dy && food==other.food
-        && priority==other.priority;
+    bool operator==(const struct Order_info&other)const{
+        return (dx==other.dx && dy==other.dy && food==other.food
+        && priority==other.priority);
     }
 }Order_info;
 

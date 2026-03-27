@@ -1,0 +1,28 @@
+# 编译产物                                                                    
+  build/                                                                        
+  *.o                                                                           
+  *.a                                                               
+  *.so                  
+  *.dylib                                       
+  epoll                                                                         
+  client
+                                                                                
+  # IDE / 编辑器                                                    
+  .vscode/              
+  .idea/                                        
+  *.swp                                                                         
+  *.swo
+  *~                                                                            
+                                                                    
+  # C++ 标准产物        
+  *.out                                         
+
+  # Unity（如果之后有）                                                         
+  Library/
+  Temp/                                                                         
+  obj/                                                              
+  *.unitypackage.meta   
+                                                                                
+  # 其他
+  *.log                                                                         
+  .DS_Store 

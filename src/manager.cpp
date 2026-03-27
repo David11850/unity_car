@@ -19,7 +19,7 @@ void Manager::addClient(Client_info client){
 void Manager::addOrder(Order_info order){
     if(order.priority>3) orders.push_front(order);
     else orders.push_back(order);
-    printf("[INFO]add order %s into queue\n",order.food);
+    printf("[INFO]add order %s into queue\n",order.food.c_str());
 }
 
 //Function : add unity car to unordered_map(unitys)
@@ -35,7 +35,22 @@ void Manager::addressSfd(int sfd){
     //sfd is client
     if(clients.find(sfd)!=clients.end()){
         //address client's order request
-
+        printf("[DEBUG]client %d sfd activate\n",sfd);
+        char buf[256];
+        memset(buf,0,sizeof(buf));
+        int num=recv(sfd,buf,sizeof(buf),0);
+        if(num==-1){
+            perror("recv client message error");
+            return;
+        }
+        else if(num==0){
+            printf("[INFO]client %d end connection\n",sfd);
+            Sever&sever=Sever::getSever();
+            sever.deleteClient(sfd);
+            close(sfd);
+            return;
+        }
+        printf("[INFO]recv message %s from client %d\n",buf,sfd);
     }
     
     //sfd is unity car
@@ -146,11 +161,11 @@ void Manager::deleteUnityFromManager(int uni_sfd){
 void Manager::deleteOrder(Order_info&order){
     auto it = find(orders.begin(), orders.end(), order);                      
       if(it==orders.end()){
-        printf("[ERROR]no such order %s in orders queue\n",order.food);
+        printf("[ERROR]no such order %s in orders queue\n",order.food.c_str());
         return;
       }                                     
       orders.erase(it);
-      printf("[INFO]delete order %s from queue\n",order.food);
+      printf("[INFO]delete order %s from queue\n",order.food.c_str());
 }
 
 //Function : show detailed info of every existed client
@@ -171,7 +186,7 @@ void Manager::showUnity(){
 //Function : show detailed info of every existed order
 void Manager::showOrder(){
     for(auto&cur:orders){
-        printf("Order %s to x:%lf y:%lf with priority %d\n",cur.food,cur.dx,cur.dy,cur.priority);
+        printf("Order %s to x:%lf y:%lf with priority %d\n",cur.food.c_str(),cur.dx,cur.dy,cur.priority);
     }
 }
 

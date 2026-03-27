@@ -31,3 +31,8 @@
   │  上报: STAT,carId,x,y,z,vx,vz,state                     │
   └─────────────────────────────────────────────────────────┘
 
+## Delight points
+1. single instance : made Sever and Manager single instance,so they can use their func everywhere instead of regist recallfunc or using static func with many unnecessary args
+2. epoll_wait logic : 
+   1. if sfd is sever_sfd(newr), we add it into epoll and wait for varify message to add to clients/unitys.and the verify part put in addressSfd func(sever.cpp) in case of newr don't send verify message and block the epoll_sever
+   2. if sfd is not secer_sfd, we call addressSfd,which find whether sfd is in clients or unitys or newer need to be verify it's identify(man made protocol) 

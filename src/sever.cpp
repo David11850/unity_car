@@ -26,7 +26,7 @@ Sever& Sever::getSever(){
 
 //function : create socket and epoll in kernal
 //           use sfd to wait for newer(client/unity) 
-//           and address client and unity request
+//           and call function to address client and unity request
 bool Sever::runSever(){
     //create socket
     sfd=socket(AF_INET,SOCK_STREAM,0);
@@ -35,6 +35,15 @@ bool Sever::runSever(){
         return false;
     }
     printf("[INFO]create sever socket\n");
+
+    //setsockopt
+    int reuse=1;
+    socklen_t len=sizeof(reuse);
+    if(setsockopt(sfd,SOL_SOCKET,SO_REUSEADDR,&reuse,len)==-1){
+        perror("setsockaddr reuse error");
+    }
+    else
+        printf("[INFO]set socket option:address reusable\n");
 
     //bind socket to ip and port
     if(bind(sfd,(sockaddr*)&sev,sizeof(sev))==-1){
@@ -50,7 +59,6 @@ bool Sever::runSever(){
     }
     printf("[INFO]listening\n");
 
-
     //add sever socket into epoll(epoll was created in init func)
     sev_ev.events=EPOLLIN;
     sev_ev.data.fd=sfd;
@@ -59,7 +67,7 @@ bool Sever::runSever(){
     }
     printf("[INFO]add sever sfd %d into epoll\n",sfd);
 
-    //add clients to epoll , use Manager func to get client
+    //add clients to epoll , use single instance Manager func to get client
     auto& manager=Manager::getManager();
     auto client_table=manager.giveClients();
     for(auto&[cli_sfd,info]:client_table){
@@ -110,21 +118,6 @@ void Sever::restartSever(){
     stopFlag=0;
 }
 
-//function : bind call back func
-void Sever::bindAddClientCall(addClientCall fun){
-    this->accl=fun;
-}
-
-//function : bind call back func
-void Sever::bindAddOrderCall(addOrderCall fun){
-    this->aocl=fun;
-}
-
-//function : bind call back func
-void Sever::bindAddUnityCall(addUnityCall fun){
-    this->aucl=fun;
-}
-
 //Function : create new sfd for newer , and add to epoll for next verify send
 void Sever::addNewConnectionToEpoll(int cli_sfd){
     //accept new client , and create new sfd for new client
@@ -133,6 +126,7 @@ void Sever::addNewConnectionToEpoll(int cli_sfd){
         perror("accept error");
         return;
     }
+    printf("[INFO]accept new_sfd %d\n",new_sfd);
 
     //create epoll_event for newer
     epoll_event new_ev;
