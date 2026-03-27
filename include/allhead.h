@@ -13,6 +13,7 @@ using namespace std;
 
 /*my lib*/
 #include"sever.h"
+#include"manager.h"
 
 
 

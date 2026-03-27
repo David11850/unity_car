@@ -1,3 +1,5 @@
+//backend sever run in epoll , and wait for sfd to activate
+
 #pragma once 
 #ifndef SEVER_H
 #define SEVER_H
@@ -5,57 +7,45 @@
 #include"./allhead.h"
 
 //for epoll
-#define SEVER_IP "192.168.0.109"
-#define SEVER_PORT 8080
-#define MAX_CLIENT 1024
+#define EPOLL_IP "192.168.0.109"
+#define EPOLL_PORT 8080
+#define EPOLL_MAX 1024
+#define MAX_CLIENT 512
+#define MAX_UNITY 512
 #define MAX_MESSAGE_LENGTH 256
 
-/*brief : backend sever run in epoll
-contact with : 
-    clients : add clients , accept clients' message , show client table
-    unity : address clients' message to data , send data to unity
-*/ 
 class Sever{
-private:
-    //sever variables
-    int sfd,efd;
-    sockaddr_in sev;
-    bool stopFlag=0;
-    epoll_event event[MAX_CLIENT];
-
-    //client variables
-    int cur_cli=0;
-    vector<int> client_table;
-
-    //unity variables
-    int unity_sfd;
-    epoll_event unity_ev;
 public:
-    Sever(int unity_sfd);
+    static Sever& getSever();
     ~Sever();
-
-    //client func
-
-    bool addClient(int cli_sfd);
-    bool addressClient(int cli_sfd);
-    bool showClient();
-    bool deleteClient(int cli_sfd);
-
-    //backend func
-
-    bool createSever();
+    bool runSever();
     void stopSever();
     void restartSever();
 
-    //unity func
-    
-    bool addressUnityData(int newsfd);
+    void addNewConnectionToEpoll(int cli_sfd);
+    void deleteClient(int cli_sfd);
+    void deleteUnity(int uni_sfd);
+
+    //recall func
+    using addClientCall=function<void(Client_info&client)>;
+    using addOrderCall=function<void(Order_info&order)>;
+    using addUnityCall=function<void(Unity_info&unity)>;
+    void bindAddClientCall(addClientCall fun);
+    void bindAddOrderCall(addOrderCall fun);
+    void bindAddUnityCall(addUnityCall fun);
+
+private:
+    Sever(); //signal instance , avoid recreate another sever in program 
+    int sfd=-1,efd=-1; //sever sfd and epoll sfd
+    bool stopFlag=0; //use to control epoll_wait
+    sockaddr_in sev; //use to create socket
+    epoll_event sev_ev; //use to add sever sfd into epoll
+    epoll_event event[MAX_CLIENT]; //use to contain activate event in epoll_wait
+
+    //recall func , which need to be bind before use
+    addClientCall accl;
+    addOrderCall aocl;
+    addUnityCall aucl;
+
 };
-
-
-
-
-
-
-
 #endif
