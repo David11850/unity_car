@@ -67,25 +67,6 @@ bool Sever::runSever(){
     }
     printf("[INFO]add sever sfd %d into epoll\n",sfd);
 
-    //add clients to epoll , use single instance Manager func to get client
-    auto& manager=Manager::getManager();
-    auto client_table=manager.giveClients();
-    for(auto&[cli_sfd,info]:client_table){
-        if(epoll_ctl(efd,EPOLL_CTL_ADD,cli_sfd,&info.cli_ev)==-1){
-            perror("epoll_ctl:add error");
-        }
-        printf("[INFO]add client %d to epoll\n",cli_sfd);
-    }
-
-    //add unity to epoll
-    auto unity_table=manager.giveUnitys();
-    for(auto&[uni_sfd,info]:unity_table){
-        if(epoll_ctl(efd,EPOLL_CTL_ADD,uni_sfd,&info.uni_ev)==-1){
-            perror("add unity to epoll error");
-        }
-        printf("[INFO]add unity %d to epoll\n",uni_sfd);
-    }
-
     //epoll_wait
     while(!stopFlag){
         //wait for sever , unity and client sfd
@@ -98,6 +79,7 @@ bool Sever::runSever(){
             }
             //existed client or unity
             else{
+                Manager&manager=Manager::getManager();
                 manager.addressSfd(acti_sfd);
             }
         }
@@ -127,6 +109,10 @@ void Sever::addNewConnectionToEpoll(int cli_sfd){
         return;
     }
     printf("[INFO]accept new_sfd %d\n",new_sfd);
+
+    //ban Nagle algorithm , which wait for 40 bits data then send and will delay the reception of unity car
+    int enable = 1;
+    setsockopt(new_sfd, IPPROTO_TCP, TCP_NODELAY, (void*)&enable, sizeof(enable));
 
     //create epoll_event for newer
     epoll_event new_ev;

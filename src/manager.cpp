@@ -33,6 +33,7 @@ void Manager::addUnity(Unity_info unity){
 //reminder : how to address client and unity are not finished
 void Manager::addressSfd(int sfd){
     //sfd is client
+    //just simulation
     if(clients.find(sfd)!=clients.end()){
         //address client's order request
         printf("[DEBUG]client %d sfd activate\n",sfd);
@@ -47,7 +48,6 @@ void Manager::addressSfd(int sfd){
             printf("[INFO]client %d end connection\n",sfd);
             Sever&sever=Sever::getSever();
             sever.deleteClient(sfd);
-            close(sfd);
             return;
         }
         printf("[INFO]recv message %s from client %d\n",buf,sfd);
@@ -55,8 +55,8 @@ void Manager::addressSfd(int sfd){
     
     //sfd is unity car
     else if(unitys.find(sfd)!=unitys.end()){
-        //accept unity's data and calculate the next spot
-        
+        //accept unity's status report and give global command
+                
     }
     
     //new client or unity car need to be verify
