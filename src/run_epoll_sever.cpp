@@ -1,4 +1,4 @@
-#include"./include/allhead.h"
+#include"../include/allhead.h"
 
 int main(int argc,char*argv[]){
     //create single instance epoll sever

@@ -7,8 +7,6 @@
 #include"./allhead.h"
 
 //for epoll
-#define EPOLL_IP "192.168.1.8"
-#define EPOLL_PORT 10000
 #define EPOLL_MAX 512
 #define MAX_CLIENT 512
 #define MAX_UNITY 512

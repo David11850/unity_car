@@ -12,34 +12,35 @@ Manager& Manager::getManager(){
 void Manager::addClient(Client_info client){
     int cli_sfd=client.cli_sfd;
     clients[cli_sfd]=client;
-    printf("[INFO]add client %d into map\n",cli_sfd);
+    printf("[INFO]add client %d into map\n------------\n",cli_sfd);
 }
 
 //Function : add order to deque(orders)
 void Manager::addOrder(Order_info order){
     if(order.priority>3) orders.push_front(order);
     else orders.push_back(order);
-    printf("[INFO]add order %s into queue\n",order.food.c_str());
+    printf("[INFO]add order %s into queue\n------------\n",order.food.c_str());
 }
 
 //Function : add unity car to unordered_map(unitys)
 void Manager::addUnity(Unity_info unity){
     int uni_sfd=unity.uni_sfd;
     unitys[uni_sfd]=unity;
-    printf("[INFO]add unity %d into map\n",uni_sfd);
+    printf("[INFO]add unity car %d into map\n------------\n",uni_sfd);
 }
 
 //Function : be used when get existed sfd in epoll
 //reminder : how to address client and unity are not finished
 void Manager::addressSfd(int sfd){
-    //sfd is client
-    //just simulation
+    //sfd is client , just simulation
     if(clients.find(sfd)!=clients.end()){
         //address client's order request
+        #ifdef DEBUG
         printf("[DEBUG]client %d sfd activate\n",sfd);
-        char buf[256];
+        #endif
+        char buf[MAX_MESSAGE_LENGTH];
         memset(buf,0,sizeof(buf));
-        int num=recv(sfd,buf,sizeof(buf),0);
+        int num=recv(sfd,buf,sizeof(buf)-1,0);
         if(num==-1){
             perror("recv client message error");
             return;
@@ -51,20 +52,26 @@ void Manager::addressSfd(int sfd){
             return;
         }
         printf("[INFO]recv message %s from client %d\n",buf,sfd);
+        /*
+        * main logic to address sever's orders , and send tasks to ready cars
+        */
     }
     
     //sfd is unity car
     else if(unitys.find(sfd)!=unitys.end()){
-        //accept unity's status report and give global command
-                
+        char buf[]="receive message from unity car\n";
+        write(1,buf,strlen(buf));
+        /*
+        * accept unity's constant status reports
+        */
     }
     
     //new client or unity car need to be verify
     else{
         //recv message from sfd to verify identity(client/unity)
-        char buf[128];
+        char buf[MAX_MESSAGE_LENGTH];
         memset(buf,0,sizeof(buf));
-        int num=recv(sfd,buf,sizeof(buf),0);
+        int num=recv(sfd,buf,sizeof(buf)-1,0);
         if(num<0){
             perror("recv for verify error");
             return;
@@ -74,7 +81,7 @@ void Manager::addressSfd(int sfd){
             close(sfd);
             return;
         }
-        printf("[INFO]recv from %d :%s\n",sfd,buf);
+        printf("[INFO]New connection received from %d : %s\n",sfd,buf);
         
         //if client
         if(strcmp(buf,"LOGIN,CLIENT")==0){
@@ -85,7 +92,7 @@ void Manager::addressSfd(int sfd){
                 perror("getpeername error");
                 return;
             }
-            printf("[INFO]get sockaddr of %d stored in kernal\n",sfd);
+            printf("[INFO]New client %d !\n",sfd);
 
             //make epoll_event
             epoll_event cli_ev;
@@ -109,7 +116,7 @@ void Manager::addressSfd(int sfd){
                 perror("getpeername error");
                 return;
             }
-            printf("[INFO]get sockaddr of %d stored in kernal\n",sfd);
+            printf("[INFO]New unity car %d !\n",sfd);
 
             //make epoll_event
             epoll_event uni_ev;
@@ -126,7 +133,7 @@ void Manager::addressSfd(int sfd){
 
         //unknown protocol
         else{
-            printf("[INFO]unknown protocol to add to new client or unity\n");
+            printf("[INFO]unknown protocol to add to manager\n------------\n");
             close(sfd);
             return;
         }

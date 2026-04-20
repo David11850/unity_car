@@ -17,7 +17,7 @@
   # C++ 标准产物        
   *.out                                         
 
-  # Unity（如果之后有）                                                         
+  # Unity                                                        
   Library/
   Temp/                                                                         
   obj/                                                              

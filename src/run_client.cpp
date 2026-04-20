@@ -1,20 +1,17 @@
-#include"./include/allhead.h"
-
-/*-------------------unchangeable----------------*/
-#define SEV_IP "192.168.1.8"
-#define SEV_PORT 10000
+#include"../include/allhead.h"
 
 /*--------------------changeable-----------------*/
-#define CLI_IP "192.168.1.8"
-//#define CLI_PORT 10001
+#define CLI_IP "192.168.0.109"
+//#define CLI_PORT 10001  considering multi client they can not use same port
+//so the port is pass by argument 1
 
 int main(int argc,char*argv[]){
     //get port info
     if(argc!=2){
-        perror("argc error");
+        printf("need argument to verify client's PORT\n");
         return -1;
     }
-    uint16_t CLI_PORT=argv[1]-"0";
+    uint16_t cli_port=argv[1]-"0";
 
     //create client socket
     int cli_sfd=socket(AF_INET,SOCK_STREAM,0);
@@ -28,7 +25,7 @@ int main(int argc,char*argv[]){
     sockaddr_in cli_ad;
     cli_ad.sin_family=AF_INET;
     cli_ad.sin_addr.s_addr=inet_addr(CLI_IP);
-    cli_ad.sin_port=htons(CLI_PORT);
+    cli_ad.sin_port=htons(cli_port);
 
     //bind with IP and port
     if(bind(cli_sfd,(sockaddr*)&cli_ad,sizeof(cli_ad))==-1){
@@ -40,8 +37,8 @@ int main(int argc,char*argv[]){
     //create sever sockaddr_in
     sockaddr_in sev_ad;
     sev_ad.sin_family=AF_INET;
-    sev_ad.sin_addr.s_addr=inet_addr(SEV_IP);
-    sev_ad.sin_port=htons(SEV_PORT);
+    sev_ad.sin_addr.s_addr=inet_addr(EPOLL_IP);
+    sev_ad.sin_port=htons(EPOLL_PORT);
 
     //connect to the sever
     if(connect(cli_sfd,(sockaddr*)&sev_ad,sizeof(sev_ad))==-1){

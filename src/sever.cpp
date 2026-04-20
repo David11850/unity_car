@@ -29,35 +29,44 @@ Sever& Sever::getSever(){
 //           and call function to address client and unity request
 bool Sever::runSever(){
     //create socket
-    sfd=socket(AF_INET,SOCK_STREAM,0);
+    sfd=socket(AF_INET,SOCK_STREAM,0);//TCP
     if(sfd==-1){
         perror("socket error");
         return false;
     }
-    printf("[INFO]create sever socket\n");
+    #ifdef DEBUG
+    printf("[INFO]create sever socket %d !\n",sfd);
+    #endif
 
-    //setsockopt
+    //setsockopt to be reusable
     int reuse=1;
     socklen_t len=sizeof(reuse);
     if(setsockopt(sfd,SOL_SOCKET,SO_REUSEADDR,&reuse,len)==-1){
         perror("setsockaddr reuse error");
     }
-    else
+    else{
+        #ifdef DEBUG
         printf("[INFO]set socket option:address reusable\n");
+        #endif
+    }
 
     //bind socket to ip and port
     if(bind(sfd,(sockaddr*)&sev,sizeof(sev))==-1){
         perror("bind error");
         return false;
     }
+    #ifdef DEBUG
     printf("[INFO]sever socket bind to IP and port\n");
+    #endif
 
     //listen on socket
     if(listen(sfd,MAX_CLIENT)==-1){
         perror("listen error");
         return false;
     }
+    #ifdef DEBUG
     printf("[INFO]listening\n");
+    #endif
 
     //add sever socket into epoll(epoll was created in init func)
     sev_ev.events=EPOLLIN;
@@ -65,7 +74,9 @@ bool Sever::runSever(){
     if(epoll_ctl(efd,EPOLL_CTL_ADD,sfd,&sev_ev)==-1){
         perror("epoll_stl:add sever sfd to epoll error");
     }
-    printf("[INFO]add sever sfd %d into epoll\n",sfd);
+    #ifdef DEBUF
+    printf("[INFO]add sever sfd %d into epoll\n-------------\n",sfd);
+    #endif
 
     //epoll_wait
     while(!stopFlag){
@@ -108,7 +119,9 @@ void Sever::addNewConnectionToEpoll(int cli_sfd){
         perror("accept error");
         return;
     }
+    #ifdef DEBUG
     printf("[INFO]accept new_sfd %d\n",new_sfd);
+    #endif
 
     //ban Nagle algorithm , which wait for 40 bits data then send and will delay the reception of unity car
     int enable = 1;
@@ -124,7 +137,9 @@ void Sever::addNewConnectionToEpoll(int cli_sfd){
         perror("epoll add error");
         return;
     }
+    #ifdef DEBUG
     printf("[INFO]add newer %d into epoll\n",new_sfd);
+    #endif
 }
 
 
