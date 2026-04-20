@@ -17,7 +17,7 @@ using namespace std;
 #include"manager.h"
 
 /*IP and PORT*/
-#define EPOLL_IP "192.168.0.109"
+#define EPOLL_IP "127.0.0.1"
 #define EPOLL_PORT 10000
 
 /*open debug mode and more info will be printed*/
