@@ -11,7 +11,7 @@
 typedef struct Order_info{
     double dx=0,dy=0;
     string food;
-    int priority=0;
+    int priority=0;//0 is less , 1 is improtant
     bool operator==(const struct Order_info&other)const{
         return (dx==other.dx && dy==other.dy && food==other.food
         && priority==other.priority);
@@ -38,7 +38,9 @@ typedef struct{
 class Manager{
 private:
     unordered_map<int,Client_info>clients;
-    deque<Order_info>orders;
+    unordered_map<int,Order_info>orders;
+    int cnt=0;
+    deque<Order_info>tasks;
     unordered_map<int,Unity_info>unitys;
     
     Manager(); //invoid others use init to create another sever instance
@@ -54,19 +56,20 @@ public:
     void addressSfd(int sfd);
     void addClient(Client_info client);
     void addOrder(Order_info order);
+    void addTask(Order_info order);
     void addUnity(Unity_info unity);
     
 
     //interface
     const unordered_map<int,Client_info>&giveClients();
-    const deque<Order_info>&giveOrders();
+    const unordered_map<int,Order_info>&giveOrders();
     const unordered_map<int,Unity_info>&giveUnitys(); 
 
     //additional
     void showClient();
     void deleteClientFromManager(int cli_sfd);
     void showOrder();
-    void deleteOrder(Order_info&order);
+    void deleteOrderFromManager(Order_info&order);
     void showUnity();
     void deleteUnityFromManager(int uni_sfd);
 };

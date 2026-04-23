@@ -1,31 +1,31 @@
 # 编译产物                                                                    
-  build/                                                                        
-  *.o                                                                           
-  *.a                                                               
-  *.so                  
-  *.dylib                                       
-  epoll                                                                         
-  client
+build/                                                                      
+*.o                                                                           
+*.a                                                               
+*.so                  
+*.dylib                                       
                                                                                 
-  # IDE / 编辑器                                                    
-  .vscode/              
-  .idea/                                        
-  *.swp                                                                         
-  *.swo
-  *~                                                                            
+# IDE / 编辑器                                                    
+.vscode/              
+.idea/                                        
+*.swp                                                                         
+*.swo
+*~                                                                            
                                                                     
-  # C++ 标准产物        
-  *.out                                         
+# C++ 标准产物        
+*.out                                         
 
-  # Unity
-  unity_code/                              
-  Library/
-  Logs/
-  ProjectSettings/
-  Temp/                                                                         
-  obj/                                                              
-  *.unitypackage.meta   
-                                                                                
-  # 其他
-  *.log                                                                         
-  .DS_Store 
+# Unity
+unity_code/                              
+Library/
+Logs/
+ProjectSettings/
+Temp/                                                                         
+obj/                                                              
+*.unitypackage.meta   
+
+draft/
+
+# 其他
+*.log                                                                         
+.DS_Store 

@@ -17,8 +17,15 @@ void Manager::addClient(Client_info client){
 
 //Function : add order to deque(orders)
 void Manager::addOrder(Order_info order){
-    if(order.priority>3) orders.push_front(order);
-    else orders.push_back(order);
+    orders[cnt]=order;
+    ++cnt;
+    printf("[INFO]add order into manager\n-------------\n");
+}
+
+//Function : add order to task deque
+void Manager::addTask(Order_info order){
+    if(order.priority==0)tasks.push_back(order);
+    else tasks.push_front(order);
     printf("[INFO]add order %s into queue\n------------\n",order.food.c_str());
 }
 
@@ -55,6 +62,28 @@ void Manager::addressSfd(int sfd){
         /*
         * main logic to address sever's orders , and send tasks to ready cars
         */
+
+       //protocal: ORDER,(priority),(dx),(dy),(food name)
+        string str(buf);
+        str=str.substr(0,5);
+        auto&manager=Manager::getManager();
+        Order_info new_order;
+        if(str=="ORDER"){
+            new_order.priority=buf[7];
+            new_order.dx=buf[9];
+            new_order.dy=buf[11];
+            str=buf;
+            str=str.substr(12,strlen(buf)-12);
+            new_order.food=str;
+            manager.addOrder(new_order);
+        }
+
+        //add to task deque
+        manager.addTask(new_order);
+        printf("[INFO]add task into deque\n");
+        
+        //send to unity car
+        
     }
     
     //sfd is unity car
@@ -165,13 +194,15 @@ void Manager::deleteUnityFromManager(int uni_sfd){
 }
 
 
-void Manager::deleteOrder(Order_info&order){
-    auto it = find(orders.begin(), orders.end(), order);                      
+void Manager::deleteOrderFromManager(Order_info&order){
+    auto it = std::find_if(orders.begin(), orders.end(),
+        [&order](const auto& p) { return p.second == order; });
       if(it==orders.end()){
         printf("[ERROR]no such order %s in orders queue\n",order.food.c_str());
         return;
       }                                     
       orders.erase(it);
+      --cnt;
       printf("[INFO]delete order %s from queue\n",order.food.c_str());
 }
 
@@ -192,8 +223,8 @@ void Manager::showUnity(){
 
 //Function : show detailed info of every existed order
 void Manager::showOrder(){
-    for(auto&cur:orders){
-        printf("Order %s to x:%lf y:%lf with priority %d\n",cur.food.c_str(),cur.dx,cur.dy,cur.priority);
+    for(auto&[index,cur]:orders){
+        printf("Order %d:%s to x:%lf y:%lf with priority %d\n",index,cur.food.c_str(),cur.dx,cur.dy,cur.priority);
     }
 }
 
@@ -203,7 +234,7 @@ const unordered_map<int,Client_info>&Manager::giveClients(){
 }
 
 //Function : intreface to get Manager::orders
-const deque<Order_info>&Manager::giveOrders(){
+const unordered_map<int,Order_info>&Manager::giveOrders(){
     return orders;
 }
 

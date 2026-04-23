@@ -1,7 +1,7 @@
 #include"../include/allhead.h"
 
 /*--------------------changeable-----------------*/
-#define CLI_IP "192.168.0.109"
+#define CLI_IP "10.210.182.202"
 //#define CLI_PORT 10001  considering multi client they can not use same port
 //so the port is pass by argument 1
 
