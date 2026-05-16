@@ -24,7 +24,9 @@ Temp/
 obj/                                                              
 *.unitypackage.meta   
 
+# non-use folder
 draft/
+test/
 
 # 其他
 *.log                                                                         

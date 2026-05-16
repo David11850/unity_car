@@ -80,7 +80,7 @@ void Manager::addressSfd(int sfd){
 
         //add to task deque
         manager.addTask(new_order);
-        printf("[INFO]add task into deque\n");
+        //printf("[INFO]add task into deque\n");
         
         //send to unity car
         
